@@ -14,6 +14,7 @@ import { RelatedDoctors } from './components/RelatedDoctors'
 
 const App = () => {
   return (
+    <div className='bg-bg-light'>
     <div className=' mx-4 sm:mx-[10%]'>
       <Navbar />
       <Routes>
@@ -29,6 +30,7 @@ const App = () => {
         <Route path='/relateddoc' element={<RelatedDoctors />} />
       </Routes>
       <Footer />
+    </div>
     </div>
   )
 }
