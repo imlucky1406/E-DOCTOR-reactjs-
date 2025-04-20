@@ -1,31 +1,17 @@
-// const routes =  require("express").Router()
-// import routes from ("express");
-import express from "express";
-const routes = express.Router();
+import express from 'express'
 
-// const userController= require("../controllers/UserController")
-import{
-    addUser,
-    getAllUsers,
-    getUserById,
-    deleteUserById,
-    signup,
-    loginUser,
-  } from "../controllers/UserController.js"
+import { getProfile, loginUser, registerUser } from '../controllers/UserController.js'
+import authUser from '../middlewares/AuthUser.js'
 
-// routes.get("/user",userController.getUser)
-// routes.post("/user",userController.addUser)
-// routes.delete("/user/:id",userController.deleteUser)
-// routes.get("/user/:id",userController.getUserById)
+const userRouter = express. Router()
+
+userRouter.post('/register', registerUser)
+userRouter.post('/login', loginUser)
 
 
-// routes.post("/user",signup)
-routes.get("/user", getAllUsers)
-routes.post("/user",addUser)
-routes.get("/user/:id", getUserById)
-routes.delete("/user/:id",deleteUserById)
-routes.post("/user/login",loginUser)
+userRouter.get('/get-profile',authUser, getProfile)
 
 
-// module.exports = routes
-export default routes
+
+
+export default userRouter

@@ -1,134 +1,82 @@
-// const userModel = require("../models/UserModel")
-
-// const addUser = async(req,res)=>{
-//     const savedUser = await userModel.create(req.body)
-
-//     res.json({
-//         message:"user added..",
-//         data:savedUser
-//     })
-// }
-
-// const getUser = async(req,res)=>{
-//     const user = await userModel.find()
-
-//     res.json({
-//         message:"User Fetched...",
-//         data:user
-//     })
-// }
-
-// const deleteUser = async(req,res)=>{
-//     const deletedUSer = await userModel.findByIdAndDelete(req.params.id)
-
-//     res.json({
-//         message:"User Deleted Successfully.....",
-//         data:deletedUSer
-//     })
-// }
-
-// const getUserById= async(req,res)=>{
-//     const foundUser = await userModel.findById(req.params.id)
-
-//     res.json({
-//         message:"User Fetched Successfully.....",
-//         data:foundUser
-//     })
-// }
-
-// module.exports = {
-//     addUser,getUser,deleteUser,getUserById
-
-// }
-
-// const userModel = require("../models/UserModel");
+import validator from "validator";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import userModel from "../models/UserModel.js";
-// const bcrypt = require("bcrypt");
-import bcrypt from "bcrypt"
+
+// API to register user
+
+const registerUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !password || !email) {
+      return res.json({ success: false, message: "Missing Details" });
+    }
+
+    if (!validator.isEmail(email)) {
+      return res.json({ success: false, message: "enter a valid email" });
+    }
+    if (password.length < 8) {
+      return res.json({ success: false, message: "enter a strong password" });
+    }
+
+    // hashing user password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const userData = {
+      name,
+      email,
+      password: hashedPassword,
+    };
+    const newUser = new userModel(userData);
+    const user = await newUser.save();
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    res.json({ success: true, token });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+// API for user login
 
 const loginUser = async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-  const foundUserFromEmail = await userModel.findOne({ email: email }).populate('roleId');
-  console.log(foundUserFromEmail);
-  
-  if (foundUserFromEmail != null) {
-    
-    const isMatch = bcrypt.compareSync(password, foundUserFromEmail.password);
-    
-    if (isMatch == true) {
-      res.status(200).json({
-        message: "login success",
-        data: foundUserFromEmail,
-      });
-    } else {
-      res.status(404).json({
-        message: "invalid cred..",
-      });
-    }
-  } else {
-    res.status(404).json({
-      message: "Email not found..",
-    });
-  }
-};
-
-const signup = async (req, res) => {
   try {
-    const salt = bcrypt.genSaltSync(10);
-    const hashedPassword = bcrypt.hashSync(req.body.password, salt);
-    req.body.password = hashedPassword;
-    const createdUser = await userModel.create(req.body);
-    res.status(201).json({
-      message: "user created..",
-      data: createdUser,
-    });
-  } catch (err) {
-    console.log(err)
-    res.status(500).json({
-      message: "error",
-      data: err,
-    });
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.json({ success: false, message: "User does not exist" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      res.json({ success: true, token });
+    } else {
+      res.json({ success: false, message: "Invalid credentials" });
+    }
+  } catch (error) {
+    console.log(error);
+
+    res.json({ success: false, message: error.message });
   }
 };
 
-const addUser = async (req, res) => {
-  
-  const savedUser = await userModel.create(req.body);
-  res.json({
-    message: "User Saved Successfully",
-    data: savedUser,
-  });
-};
-const getAllUsers = async (req, res) => {
-  const users = await userModel.find().populate("roleId");
-  res.json({
-    message: "User fetched successfully..",
-    data: users,
-  });
-};
+// API to get user profile data
 
-const getUserById = async (req, res) => {
-  const foundUser = await userModel.findById(req.params.id);
-  res.json({
-    message: "user fetched successfully..",
-    data: foundUser,
-  });
-};
+const getProfile = async (req, res) => {
 
-const deleteUserById = async (req, res) => {
-  const deletedUser = await userModel.findByIdAndDelete(req.params.id);
-  res.json({
-    message: "user deleted Successfully..",
-    data: deletedUser,
-  });
-};
+  try {
 
-export {
-  addUser,
-  getAllUsers,
-  getUserById,
-  deleteUserById,
-  signup,
-  loginUser,
-};
+    const { userId } = req.body
+    const userData = await userModel.findById(userId).select('-password')
+    res.json({success: true, userData}) 
+
+  } catch (error) {
+
+    console.log(error)
+    res.json({success: false, message:error.message})
+
+  }
+  }
+
+
+export { registerUser, loginUser, getProfile };

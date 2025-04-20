@@ -11,11 +11,15 @@ import  Navbar  from './components/Navbar'
 import { Contact } from './pages/Contact'
 import Footer from './components/Footer'
 import { RelatedDoctors } from './components/RelatedDoctors'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+
 
 const App = () => {
   return (
     <div className='bg-bg-light'>
     <div className=' mx-4 sm:mx-[10%]'>
+      <ToastContainer />
       <Navbar />
       <Routes>
         <Route path='/' element={<Home />} />

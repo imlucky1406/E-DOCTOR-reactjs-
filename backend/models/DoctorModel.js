@@ -40,7 +40,7 @@ const doctorSchema = new mongoose.Schema({
     }, 
     fees:{
         type: Number,
-        required: true,
+        require: true,
     }, 
     address:{
         type: Object,
