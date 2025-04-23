@@ -10,7 +10,7 @@ export const Doctors = () => {
   const [ShowFilter, setShowFilter] = useState(false)
   const navigate = useNavigate()
 
-  const { Doctors } = useContext(AppContext)
+  const { doctors } = useContext(AppContext)
 
 
   const applyFilter = () => {
