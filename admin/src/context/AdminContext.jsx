@@ -5,9 +5,7 @@ import { data } from "react-router-dom";
 export const AdminContext = createContext();
 
 const AdminContextProvider = (props) => {
-  const [aToken, setaToken] = useState(
-    localStorage.getItem("aToken") ? localStorage.getItem("aToken") : ""
-  );
+  const [aToken, setaToken] = useState(localStorage.getItem("aToken") ? localStorage.getItem("aToken") : "");
   const [doctors, setdoctors] = useState([]);
   const [appointments, setappointments] = useState([]);
   const [dashData, setdashData] = useState(false)

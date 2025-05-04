@@ -70,8 +70,10 @@ const Dashboard = () => {
                 </div>
                 {item.cancelled
                   ? <p className='text-red-400 text-sm font-medium'>Cancelled</p>
-                  : <img onClick={()=>cancelAppointment(item._id)} className='w-10 rounded-full cursor-pointer' src={assets.cancel_icon} alt="" />
-                }
+                  :  item.isCompleted 
+                    ? <p className='text-green-500 text-sm font-medium'>Comleted</p> 
+                    :<img onClick={()=>cancelAppointment(item._id)} className='w-10 rounded-full cursor-pointer' src={assets.cancel_icon} alt="" />
+                  }
               </div>
             ))}
           </div>
